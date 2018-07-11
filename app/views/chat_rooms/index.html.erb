@@ -20,7 +20,7 @@
 
   <tbody class="chat_room_list">
     <% @chat_rooms.reverse.each do |chat_room| %>
-      <tr>
+      <tr class="check<%=chat_room.id %>">
         <td><%= chat_room.title %></td>
         <td><span class="current<%=chat_room.id %>"><%= chat_room.admissions.size %></span> / <%= chat_room.max_count %></td>
         <td><%= chat_room.master_id %></td>
@@ -34,24 +34,42 @@
 
 <%= link_to 'New Chat Room', new_chat_room_path %>
 
+
+
+
 <script>
   $(document).on('ready', function() {
     // 자바 스크립트 function
     // 방이 만들어졌을때, 방에대한 data를 받아서 
+    
     function room_created(data) {
-      $('.chat_room_list').prepend(`
+       $('.chat_room_list').prepend(`
       <tr>
         <td>${data.title}</td>
         <td> <span class="current${data.id}">0</span> / ${data.max_count} </td>
         <td>${data.master_id}</td>
         <td><a href="/chat_rooms/${data.id}">show</a></td>
       </tr>`);
-      alert("방이 추가되었습니다.");
+      console.log("방이 추가되었습니다.");
     }
     
     function user_joined(data){
       var current = $(`.current${data.chat_room_id}`);
       current.text(parseInt(current.text())+1);
+    }
+    
+    function user_exit(data){
+      var current = $(`.current${data.chat_room_id}`);
+      current.text(parseInt(current.text())-1);
+    }
+    
+    function room_delete(data){
+      $(`.check${data.id }`).remove();
+      console.log("방이 삭제 되었습니다.");
+    }
+    
+    function room_update(data){
+      console.log("방이 수정되었습니다.");
     }
     
     
@@ -61,16 +79,34 @@
     });
 
     var channel = pusher.subscribe('chat_room');
+    
     channel.bind('create', function(data) {
       console.log(data);
       room_created(data);
     });
+    
     // 방 목록에 추가해주는 function
     channel.bind('join', function(data) {
       console.log(data);
-      user_joined(data);
+      user_joined(data)
+      
     });
     
+    channel.bind('exit', function(data) {
+      console.log(data);
+      user_exit(data)
+    });
+    
+    
+    channel.bind('destroy', function(data){
+      room_delete(data)
+    });
+
+    channel.bind('update', function(data){
+      room_update(data)
+      location.reload();
+    });
+
     
   });
 </script>
