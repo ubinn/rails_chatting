@@ -11,4 +11,11 @@ class User < ApplicationRecord
   def joined_room?(room)
     self.chat_rooms.include?(room)
   end
+  
+  def is_ready?(room)
+    self.admissions.where(chat_room_id: room.id).first.ready_state
+  end
+  
+  
+  
 end

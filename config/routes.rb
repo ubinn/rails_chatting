@@ -9,6 +9,7 @@ Rails.application.routes.draw do
       post'/join' => 'chat_rooms#user_admit_room', as: 'join'
       post'/chat' => 'chat_rooms#chat'
       delete '/exit' => 'chat_rooms#user_exit_room'
+      post '/ready' => 'chat_rooms#is_user_ready'
     end
   end
   

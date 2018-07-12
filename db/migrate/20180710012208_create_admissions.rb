@@ -5,6 +5,7 @@ class CreateAdmissions < ActiveRecord::Migration[5.0]
       t.references    :chat_room
       t.references    :user
       
+      t.boolean :ready_state, default: false, null: false 
       t.timestamps
     end
   end

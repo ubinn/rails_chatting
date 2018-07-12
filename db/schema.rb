@@ -15,8 +15,9 @@ ActiveRecord::Schema.define(version: 20180710012208) do
   create_table "admissions", force: :cascade do |t|
     t.integer  "chat_room_id"
     t.integer  "user_id"
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
+    t.boolean  "ready_state",  default: false, null: false
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
     t.index ["chat_room_id"], name: "index_admissions_on_chat_room_id"
     t.index ["user_id"], name: "index_admissions_on_user_id"
   end

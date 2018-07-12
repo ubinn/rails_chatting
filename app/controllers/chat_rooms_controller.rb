@@ -1,5 +1,5 @@
 class ChatRoomsController < ApplicationController
-  before_action :set_chat_room, only: [:show, :edit, :update, :destroy, :user_admit_room, :chat, :user_exit_room]
+  before_action :set_chat_room, only: [:show, :edit, :update, :destroy, :user_admit_room, :chat, :user_exit_room,:is_user_ready]
   before_action :authenticate_user!, except: [:index]
   # user_signed_in? 은 안돼 redirect가 안되기 때문에
 
@@ -17,7 +17,9 @@ class ChatRoomsController < ApplicationController
         @chat_room.master_id = @chat_room.users.sample().email 
      end 
     else 
+      @chat_room.admissions.destroy();
       @chat_room.destroy()
+      redirect_to root_path
     end 
   end
 
@@ -76,12 +78,23 @@ class ChatRoomsController < ApplicationController
   
   def user_admit_room
     # 현재 유저가 있는 방에서 join버튼을 눌렀을때 동작하는 액션
-     if current_user.joined_room?(@chat_room)
+    if current_user.joined_room?(@chat_room)
       render js: "alert('이미 참여한 방입니다');"
-     else
+    else
       @chat_room.user_admit_room(current_user)
-     end
+    end
   end
+  
+  def is_user_ready
+    if current_user.is_ready?(@chat_room)
+      render js: "console.log('이미레디상태');"
+    else
+      @chat_room.user_ready(current_user)
+      render js: "console.log('레디로 바꼈습니다.');"
+    end
+  end
+  
+  
   def user_exit_room 
     # chat_room 에 인스턴스 메소드로 사용된다 user_exit_room이 
     @chat_room.user_exit_room(current_user)
@@ -91,7 +104,6 @@ class ChatRoomsController < ApplicationController
     @chat_room.chats.create(user_id: current_user.id, message: params[:message])
   end
   
-
   
 
 
