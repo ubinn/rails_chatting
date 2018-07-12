@@ -9,18 +9,21 @@
 <hr>
 
 
-
-
-<% if current_user.joined_room?(@chat_room) %>
-<div class="chat_list">
- <% @chat_room.chats.each do |chat| %>
-    <p><%= chat.user.email%> : <%= chat.message %><small> <%= chat.created_at %></small></p>
-<%end%> 
-</div>
-<%= form_tag("/chat_rooms/#{@chat_room.id}/chat", remote: true) do %>
-    <%= text_field_tag :message %>
-<% end %>
-<hr/>
+<% count = 0 %>
+<% @chat_room.admissions.each do |admission| %>
+    <% if admission.ready_state %>
+    <% count += 1 ; puts count%>
+        <% if count == @chat_room.max_count %>
+            <div class="chat_list">
+            <% @chat_room.chats.each do |chat| %>
+                <p><%= chat.user.email%> : <%= chat.message %><small> <%= chat.created_at %></small></p>
+            <%end%> 
+            </div>
+            <%= form_tag("/chat_rooms/#{@chat_room.id}/chat", remote: true) do %>
+                <%= text_field_tag :message %>
+            <% end %>
+        <%end%>
+    <% end %>
 <% end %>
 
 
