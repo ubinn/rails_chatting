@@ -27,8 +27,9 @@ ActiveRecord::Schema.define(version: 20180710012208) do
     t.string   "master_id"
     t.integer  "max_count"
     t.integer  "admissions_count", default: 0
-    t.datetime "created_at",                   null: false
-    t.datetime "updated_at",                   null: false
+    t.boolean  "room_status",      default: false
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
   end
 
   create_table "chats", force: :cascade do |t|

@@ -61,3 +61,6 @@ gem 'devise'
 
 #key encrypt
 gem 'figaro'
+
+# #console-beautify
+# gem 'pry-rails'

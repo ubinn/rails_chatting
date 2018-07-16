@@ -7,24 +7,21 @@ class ChatRoomsController < ApplicationController
   # GET /chat_rooms.json
   def index
     @chat_rooms = ChatRoom.all
+    
   end
 
   # GET /chat_rooms/1
   # GET /chat_rooms/1.json
   def show
     unless current_user.joined_room?(@chat_room)
-    @chat_room.user_admit_room(current_user)
+      @chat_room.user_admit_room(current_user)
     end
-    
-    if (@chat_room.users.size > 0) 
-     unless @chat_room.master_id.eql?(current_user.email)
-        @chat_room.master_id = @chat_room.users.sample().email 
+     if @chat_room.admissions_count > 0
+        
+     else 
+       @chat_room.destroy()
+       redirect_to root_path
      end 
-    else 
-      @chat_room.admissions.destroy();
-      @chat_room.destroy()
-      redirect_to root_path
-    end 
   end
 
   # GET /chat_rooms/new
@@ -93,8 +90,12 @@ class ChatRoomsController < ApplicationController
     if current_user.is_ready?(@chat_room)
       render js: "console.log('이미레디상태');"
     else
+      # @chat_room.admissions.where(user_id: currnet_user.id)[0].ready_state
       @chat_room.user_ready(current_user)
       render js: "console.log('레디로 바꼈습니다.');"
+      
+      # 현재 레디한 방 외에 모든 방의 레디상태해제
+      current_user.admissions.where.not(chat_room_id: @chat_room.id).destroy_all
     end
   end
   
@@ -102,14 +103,21 @@ class ChatRoomsController < ApplicationController
   def user_exit_room 
     # chat_room 에 인스턴스 메소드로 사용된다 user_exit_room이 
     @chat_room.user_exit_room(current_user)
-    redirect_to '/chat_rooms/index'
+    if @chat_room.admissions_count <= 1
+      @chat_room.destroy()
+    end
+      
   end
   
   def chat
     @chat_room.chats.create(user_id: current_user.id, message: params[:message])
   end
   
-  
+  # def room_status_change
+  #   if @chat_room.admissions_count  == @chat_room.max_count
+  #     @chat_room.room_status = true
+  #   end  
+  # end
 
 
 

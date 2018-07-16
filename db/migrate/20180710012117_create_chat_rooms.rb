@@ -6,6 +6,7 @@ class CreateChatRooms < ActiveRecord::Migration[5.0]
       
       t.integer :max_count
       t.integer :admissions_count, default: 0
+      t.boolean :room_status, default: false
       
       
       

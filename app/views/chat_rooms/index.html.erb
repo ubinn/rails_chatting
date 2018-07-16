@@ -14,6 +14,7 @@
       <th>방제</th>
       <th>인원</th>
       <th>방장</th>
+
       <th colspan="3"></th>
     </tr>
   </thead>
@@ -24,7 +25,9 @@
         <td><%= chat_room.title %></td>
         <td><span class="current<%=chat_room.id %>"><%= chat_room.admissions.size %></span> / <%= chat_room.max_count %></td>
         <td><%= chat_room.master_id %></td>
-        <td><%= link_to 'Show', chat_room %></td>
+        <% if chat_room.max_count > chat_room.admissions_count %>
+        <td class="show<%=chat_room.id %>"><%= link_to 'Show', chat_room %></td>
+        <% end %>
       </tr>
     <% end %>
   </tbody>
@@ -33,9 +36,6 @@
 <br>
 
 <%= link_to 'New Chat Room', new_chat_room_path %>
-
-
-
 
 <script>
   $(document).on('ready', function() {
@@ -48,7 +48,7 @@
         <td>${data.title}</td>
         <td> <span class="current${data.id}">0</span> / ${data.max_count} </td>
         <td>${data.master_id}</td>
-        <td><a href="/chat_rooms/${data.id}">show</a></td>
+        <td class="show${data.id}"><a href="/chat_rooms/${data.id}">show</a></td>
       </tr>`);
       console.log("방이 추가되었습니다.");
     }
@@ -56,13 +56,23 @@
     function user_joined(data){
       var current = $(`.current${data.chat_room_id}`);
       current.text(parseInt(current.text())+1);
+      
+      console.log(data)
+      console.log(data.current_state + "이게 펑션안")
+      
+      if (data.current_state = true){
+         $(`.show${data.chat_room_id}`).remove();
+      }
     }
-    
+
     function user_exit(data){
       var current = $(`.current${data.chat_room_id}`);
       current.text(parseInt(current.text())-1);
+      console.log(current)
     }
     
+    
+    // 방장이 사용할수있는 메소드
     function room_delete(data){
       $(`.check${data.id }`).remove();
       console.log("방이 삭제 되었습니다.");
@@ -83,13 +93,14 @@
     channel.bind('create', function(data) {
       console.log(data);
       room_created(data);
+      console.log("방생성함수실행뒤!");
     });
     
     // 방 목록에 추가해주는 function
     channel.bind('join', function(data) {
       console.log(data);
-      user_joined(data)
-      
+      user_joined(data);
+
     });
     
     channel.bind('exit', function(data) {
@@ -106,6 +117,8 @@
       room_update(data)
       location.reload();
     });
+    
+
 
     
   });

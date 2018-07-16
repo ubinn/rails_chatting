@@ -24,6 +24,8 @@ class ChatRoom < ApplicationRecord
         Pusher.trigger('chat_room','update', self.as_json)
     end
     
+
+    
     
     def user_admit_room(user) #인스턴스 메소드
        # chat_room 이 만들어지고 나면, 이 메소드도 같이 실행하라
@@ -39,4 +41,7 @@ class ChatRoom < ApplicationRecord
         user_state.ready_state=true
         user_state.save
     end
+    
+
+    
 end
